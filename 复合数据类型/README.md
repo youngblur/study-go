@@ -78,5 +78,48 @@ func appendInt(x []int, y ...int) []int {
 ```
 
 ## 2.2 Slice内存技巧
+判断 非空字符串，可以共享内存
+```go
+func nonempty(strings []string) []string{
+    out := strings[:0] // zero-length slice of original
+    for _, s := range strings{
+        if s != "" {
+            out = append(out, s)
+        }
+    }
+    return out
+}
 
+```
+移除指定位置的元素
+```go
+func remove(slice []int, i int) []int{
+    copy(slice[i:], slice[i+1:])
+    return slice[:len(slice)-1]
+}
+```
+# 3. Map
+创建map一个空map
+```go
+ages := make(map[string]int)
+ages := map[string]int{}
+```
+内置的`delete`函数可以删除元素
+```go
+delete(ages,"alice")
+```
+当查找不存在时，将返回零值,也可以使用 `age, ok = ages[key]` 
+map中的元素并不是一个变量，因此我们不能对map元素进行取址操作
+
+# 4. 结构体
+结构体内部成员顺序不同，则类型不同
+```go
+type Employee struct {
+    ID      int
+    Name    String
+}
+var dilbert Employee
+// 可以指向结构体，也可以指向结构体的成员
+var index *Employee = &disbert
+```
 
