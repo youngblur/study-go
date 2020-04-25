@@ -112,7 +112,7 @@ delete(ages,"alice")
 map中的元素并不是一个变量，因此我们不能对map元素进行取址操作
 
 # 4. 结构体
-结构体内部成员顺序不同，则类型不同
+结构体内部成员顺序不同，则类型不同.可以直接对成员进行赋值。
 ```go
 type Employee struct {
     ID      int
@@ -121,7 +121,92 @@ type Employee struct {
 var dilbert Employee
 // 可以指向结构体，也可以指向结构体的成员
 var index *Employee = &disbert
+name := &Employee.Name
 ```
+相邻成员拥有相同类型，可以合在一行  
+对于`首字母小写`的成员，其是隐式的，未导出的。所以不能导出。  
+如果结构的成员都是可以比较的，那么结构体也是可以比较的
+## 4.1 结构体嵌入和匿名成员
+```go
+type Point struct{
+    X, Y  int
+}
+
+type Circle struct{
+    Center Point
+    Radius int
+}
+
+var c Circle
+c.Center.X = 1
+c.Center.Y = 2
+```
+结构体重只声明成员的类型，而不指名成员的名字，这类成员就是匿名成员。
+```go
+type Circle struct{
+    Point
+    Radius int
+}
+
+var c Circle
+c.X = 1     // 省去 Center
+c.Y = 1
+```
+但是不能进行字面值语法，即
+```go
+c = Circle{1,1,1}  // 不能成功编译
+
+c = Circle{Point{1,1}, 1} 
+```
+
+#5. JSON
+JSON对象可以用来编码Go语言中的map类型(key 是字符串) 和 结构体
+[josn完整例子](json.go)
+```go
+type Movie = struct{
+    Title string
+    // 因为go里成员都是大写的，但是有些json是小写的，所以用tag来控制
+    Year int `json: "released"`		//Tag 来控制编码和解码，将 Year 对应到 json 中的 released.
+    Color bool `json:"color, omitempty"`
+    Actors []string
+}
+
+func main() {
+    var movies = []Movie{
+        {Title: "Casablance", Year: 1942, Color: false,
+            Actors: []string{"Humphrey Bogart", "Ingrid Bergman"}},
+        {Title: "Cool Hand Luke", Year: 1967, Color: true,
+            Actors: []string{"Paul Newman"}},
+        // ...
+    }
+    data, err := json.Marshal(movies)
+    if err != nil{
+        log.Fatal("JSON marshling failed: %s", err)
+    }
+    fmt.Printf("%s \n", data)
+    
+    // 便于阅读，prefix 是每一行输出的前缀，indent是每一层输出的前缀
+    data2, err2 := json.MarshalIndent(movies, "", "    ")
+    if err2 != nil {
+        log.Fatal("JSON marshling failed: %s", err)
+    }
+    fmt.Printf("%s \n", data2)
+    
+    var titles []struct{ Title string}
+    if err3 := json.Unmarshal(data, &titles); err3 != nil {
+        log.Fatal("JSON unmarshaling failed: %s", err3)
+    }
+    fmt.Println(titles)
+}
+```
+
+# 6. 文本 和 HTML 模板
+...
+
+
+
+
+
 
 
 
