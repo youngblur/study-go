@@ -124,4 +124,39 @@ fmt.Printf("%T\n", g) // "func([]int)"
 ```
 
 # 7. Deferred 函数
+在普通函数或者方法前加上关键字 `defer`。 跟在后面的语句会被延迟执行。直到包含该`defer`语句的函数执行完毕后，defer后的语句才会执行。
+```go
+func double(x int) (result int){
+    defer func() {fmt.Printf("double(%d) = %d\n", x, result) }()
+    return x + x
+}
+
+_ = double(4)           // "double(4) = 8"
+
+func triple(x) (result int){
+    defer func() {result += x}()
+    return double(x)
+}
+fmt.Prinln(triple(4))    // "12"
+```
+使用循环体时需要注意，defer是函数结束后才会执行，所以循环结束并不会立即执行循环体内的defer内容
+
+# 8. Panic 异常
+运行时的错误会引起panic异常(数组访问越界、空指针引用等)  
+当panic异常发生，会立即执行该goroutime(可以先理解为线程)中被延迟的函数
+
+# 9. Recover 捕获异常
+通常来说，不应该对panic异常做任何处理，也许我们可以从异常中恢复，但至少可以在程序崩溃之前做一些事情(如：web服务崩溃前关闭所有连接，不做处理客户端会一直等待)。  
+recover 会从异常panic异常中恢复，并返回panic value。在未发生异常时调用recover会返回`nil`
+```go 
+func Parse(input string) (s *Syntax, err error) {
+    defer func() {
+        if p := recover(); p != nil {
+            err = fmt.Errorf("internal error : %v", p)
+        }   
+    }()
+    // ... parse code ...
+}
+```
+
 
