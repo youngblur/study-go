@@ -18,5 +18,7 @@
 [第十二章、反射](反射) | 
 [第十三章、底层编码](底层编码) |  
 
+注: 从第六章开始，使用jupyter导出markdown格式
 
-入门指南: [Go指南](http://tour.studygolang.com/list)
+入门指南: [Go指南](http://tour.studygolang.com/list)  
+
